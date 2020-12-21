@@ -1,20 +1,14 @@
 
 
-var numberOfPoints = 14;
+var numberOfPoints = 3;
 var points = [];
 var order = [];
 
 var recordDistance;
 var bestPath;
 
-var startingNode;
-
-var alreadyChecked = [];
-
 attemptCount = 0;
 maxAttempts = factorial(numberOfPoints);
-
-// console.log(maxAttempts);
 
 function setup() {
     createCanvas(windowWidth - 10, windowHeight - 10);
@@ -27,36 +21,31 @@ function setup() {
         order[i] = i;
     }
 
-    startingNode = points[0];
     recordDistance = calculateDistance(points, order);
     // Create a copy of the array
-    bestPath = points.slice();
-    
+    bestPath = order.slice();
 }
 
 function draw() {
     // clears previous frame
     background(220);
-
-    // fill('red');
     strokeWeight(2);
-    // Highlight starting node
-
     noFill();
+
     // Draw points
     for(i = 0; i < numberOfPoints; i++) {
-        // text(i + 1, points[i].x, points[i].y, RADIUS);
         ellipse(points[i].x, points[i].y, 40);
     }
 
     // Render best path
     stroke(51);
-    strokeWeight(4);
+    strokeWeight(5);
     noFill();
     beginShape();
     // Draw lines
     for(i = 0; i < numberOfPoints; i++) {
-        vertex(bestPath[i].x, bestPath[i].y);
+        var index = bestPath[i];
+        vertex(points[index].x, points[index].y);
     }
     endShape(CLOSE);
 
@@ -75,30 +64,33 @@ function draw() {
     // Render Node Text
     strokeWeight(0);
     fill(51);
-    textSize(22);
+    textSize(32);
     textAlign(RIGHT, CENTER);
     for(i = 0; i < numberOfPoints; i++) {
-        text(i + 1, bestPath[i].x, bestPath[i].y, 50);
+        text(i + 1, points[bestPath[i]].x, points[bestPath[i]].y, 50);
     }
 
     var d = calculateDistance(points, order);
 
     if (d < recordDistance) {
         recordDistance = d;
-        bestPath = points.slice();
+        bestPath = order.slice();
+        console.log('New best!', d);
     }
 
     textSize(32);
     fill(51);
     var percentComplete = 100 * (attemptCount / maxAttempts);
     text(nf(percentComplete, 0, 2) + '% completed', width - 50, height - 50);
+    console.log(attemptCount);
+    console.log(order);
     nextOrder();
 }
 
 function calculateDistance(points, order) {
     var sum = 0;
 
-    for (i = 0; i < numberOfPoints - 1; i++) {
+    for (i = 0; i < numberOfPoints; i++) {
 
         var pointAIndex = order[i];
         var pointA = points[pointAIndex];
@@ -115,7 +107,6 @@ function calculateDistance(points, order) {
     }
     return sum;
 }
-
 
 // Lexical ordering
 function nextOrder() {
@@ -143,6 +134,7 @@ function nextOrder() {
     }
 
     // Step 3
+    console.log("Swapping", order[largestX], order[largestY]);
     swap(order, largestX, largestY);
 
     // Step 4
